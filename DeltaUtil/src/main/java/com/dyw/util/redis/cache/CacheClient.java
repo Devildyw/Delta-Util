@@ -48,7 +48,10 @@ public class CacheClient {
      * @param time  逻辑过期时间
      * @param unit  时间单位
      */
-    public void setWithLogicalExpire(String key, Object value, Long time, TimeUnit unit) {
+    public void setWithLogicalExpire(String key,
+                                     Object value,
+                                     Long time,
+                                     TimeUnit unit) {
         //设置逻辑过期时间
         RedisData redisData = new RedisData();
         redisData.setData(value);
@@ -65,7 +68,10 @@ public class CacheClient {
      * @param time  到期时间
      * @param unit  时间精度
      */
-    public void set(String key, Object value, Long time, TimeUnit unit) {
+    public void set(String key,
+                    Object value,
+                    Long time,
+                    TimeUnit unit) {
         stringRedisTemplate.opsForValue().set(key, JSONUtil.toJsonStr(value), time, unit);
     }
 
@@ -82,7 +88,12 @@ public class CacheClient {
      * @param <ID>       定义的id类型
      * @return R
      */
-    public <R, ID> R queryWithPassThrough(String keyPrefix, ID id, Class<R> type, Function<ID, R> dbFallback, Long time, TimeUnit unit) {
+    public <R, ID> R queryWithPassThrough(String keyPrefix,
+                                          ID id,
+                                          Class<R> type,
+                                          Function<ID, R> dbFallback,
+                                          Long time,
+                                          TimeUnit unit) {
         String key = keyPrefix + id;
         //1. 从redis查询业务数据缓存
         String json = stringRedisTemplate.opsForValue().get(key);
@@ -126,7 +137,13 @@ public class CacheClient {
      * @param <ID>          定义的id类型的泛型
      * @return R
      */
-    public <R, ID> R queryWithLogicalExpire(String keyPrefix, ID id, Class<R> type, Function<ID, R> dbFallback, String lockKeyPrefix, Long time, TimeUnit unit) {
+    public <R, ID> R queryWithLogicalExpire(String keyPrefix,
+                                            ID id,
+                                            Class<R> type,
+                                            Function<ID, R> dbFallback,
+                                            String lockKeyPrefix,
+                                            Long time,
+                                            TimeUnit unit) {
         String key = keyPrefix + id;
         //1. 从redis查询业务数据缓存
         String json = stringRedisTemplate.opsForValue().get(key);
@@ -157,7 +174,10 @@ public class CacheClient {
                     //查询数据库
                     R r1 = dbFallback.apply(id);
                     //写入redis
-                    this.setWithLogicalExpire(key, r1, time, unit);
+                    this.setWithLogicalExpire(key,
+                            r1,
+                            time,
+                            unit);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 } finally {
@@ -178,7 +198,10 @@ public class CacheClient {
      * @return true:符合，false：不符合
      */
     private boolean tryLock(String key) {
-        Boolean aBoolean = stringRedisTemplate.opsForValue().setIfAbsent(key, "1", 10, TimeUnit.SECONDS);
+        Boolean aBoolean = stringRedisTemplate.opsForValue().setIfAbsent(key,
+                "1",
+                10,
+                TimeUnit.SECONDS);
         return BooleanUtil.isTrue(aBoolean);
     }
 
@@ -189,5 +212,73 @@ public class CacheClient {
      */
     private void unlock(String key) {
         stringRedisTemplate.delete(key);
+    }
+
+    /**
+     * 缓存击穿解决方案: 互斥锁
+     *
+     * @param keyPrefix  key前缀
+     * @param id         id
+     * @param type       传入的返回结果类型
+     * @param dbFallback 传入的函数
+     * @param time       过期时间
+     * @param unit       时间精度
+     * @param <R>        定义的返回结果类型的泛型
+     * @param <ID>       定义的传入ID的类型
+     * @return R 结果业务数据
+     */
+    public <R, ID> R queryWithMutex(String keyPrefix,
+                                    ID id,
+                                    Class<R> type,
+                                    Function<ID, R> dbFallback,
+                                    Long time,
+                                    TimeUnit unit,
+                                    String lockPrefix) {
+        String key = keyPrefix + id;
+        //从redis中查询商品缓存
+        String json = stringRedisTemplate.opsForValue().get(key);
+        //判断是否存在
+        if (StrUtil.isNotBlank(json)) {
+            //存在直接返回
+            return JSONUtil.toBean(json, type);
+        }
+        //判断命名的是否是空值
+        if (json != null) {
+            //返回一个空值
+            return null;
+        }
+
+        //实现缓存重建
+        //获取互斥锁
+        String lockKey = lockPrefix + id;
+        R r = null;
+
+        try {
+            boolean isLock = tryLock(lockKey);
+            //判断是否获取成功
+            if (!isLock) {
+                //获取锁失败,休眠并重试
+                Thread.sleep(50);
+                //休眠一段时间后 休眠递归调用完成重试
+                return queryWithLogicalExpire(keyPrefix, id, type, dbFallback, lockPrefix, time, unit);
+            }
+            //获取成功 根据id查询数据库
+            r = dbFallback.apply(id);
+            //不存在,返回错误
+            if (r == null) {
+                //将空值写入redis
+                stringRedisTemplate.opsForValue().set(key, "", time, unit);
+                //返回错误信息
+                return null;
+            }
+            //存在写入redis缓存
+            this.set(key, r, time, unit);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            //释放锁
+            unlock(lockKey);
+        }
+        return r;
     }
 }

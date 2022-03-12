@@ -8,14 +8,15 @@
         <version>2.6.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
+    <packaging>jar</packaging>
     <groupId>com.dyw</groupId>
-    <artifactId>DeltaUtil</artifactId>
+    <artifactId>Delta-Util</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>DeltaUtil</name>
     <description>DeltaUtil</description>
     <properties>
-        <java.version>11</java.version>
-        <hutool.version>5.7.17</hutool.version>
+        <java.version>8</java.version>
+        <hutool.version>5.7.22</hutool.version>
         <lombok.version>1.18.22</lombok.version>
         <commons-pool2.version>2.11.1</commons-pool2.version>
     </properties>
@@ -52,6 +53,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.cuit.epoch</groupId>
+            <artifactId>common-util</artifactId>
+            <version>1.5-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
