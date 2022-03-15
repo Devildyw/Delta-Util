@@ -3,6 +3,7 @@ package com.dyw.util.Jwt;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -16,19 +17,20 @@ import java.util.Map;
  * @create 2022-03-14 19:02
  */
 @Component
+@ConfigurationProperties(prefix = "jwt.util")
 public class JwtUtil {
     /**
      * 默认3600秒过期时间
      */
-    private static long tokenExpiredTime =60*60*1000;
+    private static long tokenExpiredTime = 60*60*1000;
     /**
      * 默认jwt id
      */
-    private static String JWT_ID ="tokenId";
+    private static String JWT_ID = "tokenId";
     /**
      * 默认的KEY_SECRET_SALT
      */
-    private static String KEY_SECRET_SALT ="aPbOBbnH4gnZBzIKEY7mxWNu49kYljNPMeta9Fjrwwqzw0bFlO0kPXZTCGaVcw0jzq";
+    private static String KEY_SECRET_SALT = "aPbOBbnH4gnZBzIKEY7mxWNu49kYljNPMeta9Fjrwwqzw0bFlO0kPXZTCGaVcw0jaq";
 
     /**
      * 由key明文生成的SecretKey
@@ -100,7 +102,7 @@ public class JwtUtil {
         return createJwt(map, tokenExpiredTime);
     }
 
-    public static Long getTokenExpiredTime() {
+    public static long getTokenExpiredTime() {
         return tokenExpiredTime;
     }
 
@@ -124,16 +126,16 @@ public class JwtUtil {
         KEY_SECRET_SALT = keySecretSalt;
     }
 
-    /**
-     * 如果不愿使用默认的jwt相关参数 可以使用init方法修改
-     *
-     * @param tokenExpiredTime 指定的过期时间
-     * @param jwtId            指定的jwtId
-     * @param secretSalt       指定的加密盐
-     */
-    public static void init(long tokenExpiredTime, String jwtId, String secretSalt) {
-        JwtUtil.tokenExpiredTime = tokenExpiredTime;
-        JwtUtil.JWT_ID = jwtId;
-        JwtUtil.KEY_SECRET_SALT = secretSalt;
-    }
+//    /**
+//     * 如果不愿使用默认的jwt相关参数 可以使用init方法修改
+//     *
+//     * @param tokenExpiredTime 指定的过期时间
+//     * @param jwtId            指定的jwtId
+//     * @param secretSalt       指定的加密盐
+//     */
+//    public static void init(long tokenExpiredTime, String jwtId, String secretSalt) {
+//        JwtUtil.tokenExpiredTime = tokenExpiredTime;
+//        JwtUtil.JWT_ID = jwtId;
+//        JwtUtil.KEY_SECRET_SALT = secretSalt;
+//    }
 }
