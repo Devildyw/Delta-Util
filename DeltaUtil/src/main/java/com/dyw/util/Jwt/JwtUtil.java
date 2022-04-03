@@ -3,9 +3,10 @@ package com.dyw.util.Jwt;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import lombok.Data;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,9 +17,34 @@ import java.util.Map;
  * @author Devil
  * @create 2022-03-14 19:02
  */
+
 @Component
-@ConfigurationProperties(prefix = "jwt.util")
+@Data
 public class JwtUtil {
+    public static long getTokenExpiredTime() {
+        return tokenExpiredTime;
+    }
+
+    public static void setTokenExpiredTime(long tokenExpiredTime) {
+        JwtUtil.tokenExpiredTime = tokenExpiredTime;
+    }
+
+    public static String getJwtId() {
+        return jwtId;
+    }
+
+    public static void setJwtId(String jwtId) {
+        JwtUtil.jwtId = jwtId;
+    }
+
+    public static String getKeySecretSalt() {
+        return keySecretSalt;
+    }
+
+    public static void setKeySecretSalt(String keySecretSalt) {
+        JwtUtil.keySecretSalt = keySecretSalt;
+    }
+
     /**
      * 默认3600秒过期时间
      */
@@ -26,11 +52,11 @@ public class JwtUtil {
     /**
      * 默认jwt id
      */
-    private static String JWT_ID = "tokenId";
+    private static String jwtId = "tokenId";
     /**
      * 默认的KEY_SECRET_SALT
      */
-    private static String KEY_SECRET_SALT = "aPbOBbnH4gnZBzIKEY7mxWNu49kYljNPMeta9Fjrwwqzw0bFlO0kPXZTCGaVcw0jaq";
+    private static String keySecretSalt = "aPbOBbnH4gnZBzIKEY7mxWNu49kYljNPMeta9Fjrwwqzw0bFlO0kPXZTCGaVcw0jzq";
 
     /**
      * 由key明文生成的SecretKey
@@ -38,7 +64,7 @@ public class JwtUtil {
      * @return SecretKey
      */
     public static SecretKey generalKey() {
-        String secretSalt = JwtUtil.KEY_SECRET_SALT;
+        String secretSalt = keySecretSalt;
         byte[] decode = Decoders.BASE64.decode(secretSalt);
         return Keys.hmacShaKeyFor(decode);
     }
@@ -59,7 +85,7 @@ public class JwtUtil {
         SecretKey secretKey = generalKey();
         JwtBuilder builder = Jwts.builder()
                 //设置JWT
-                .setId(JWT_ID)
+                .setId(jwtId)
                 //设置负载
                 .setClaims(map)
                 //签发时间
@@ -101,41 +127,4 @@ public class JwtUtil {
         map.put("id", id);
         return createJwt(map, tokenExpiredTime);
     }
-
-    public static long getTokenExpiredTime() {
-        return tokenExpiredTime;
-    }
-
-    public static void setTokenExpiredTime(long tokenExpiredTime) {
-        JwtUtil.tokenExpiredTime = tokenExpiredTime;
-    }
-
-    public static String getJwtId() {
-        return JWT_ID;
-    }
-
-    public static void setJwtId(String jwtId) {
-        JWT_ID = jwtId;
-    }
-
-    public static String getKeySecretSalt() {
-        return KEY_SECRET_SALT;
-    }
-
-    public static void setKeySecretSalt(String keySecretSalt) {
-        KEY_SECRET_SALT = keySecretSalt;
-    }
-
-//    /**
-//     * 如果不愿使用默认的jwt相关参数 可以使用init方法修改
-//     *
-//     * @param tokenExpiredTime 指定的过期时间
-//     * @param jwtId            指定的jwtId
-//     * @param secretSalt       指定的加密盐
-//     */
-//    public static void init(long tokenExpiredTime, String jwtId, String secretSalt) {
-//        JwtUtil.tokenExpiredTime = tokenExpiredTime;
-//        JwtUtil.JWT_ID = jwtId;
-//        JwtUtil.KEY_SECRET_SALT = secretSalt;
-//    }
 }

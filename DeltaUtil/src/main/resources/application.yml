@@ -1,0 +1,5 @@
+jwt:
+  util:
+    token-expired-time: 36000
+    jwt-id: 100
+    key-secret-salt: adsfhjfkahdfjdahjklljdafhjkdfsakjhsdfjkhsfhjkashjkfd
