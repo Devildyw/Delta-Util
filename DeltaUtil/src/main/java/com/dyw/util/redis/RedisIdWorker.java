@@ -13,7 +13,6 @@ import java.time.format.DateTimeFormatter;
  * @author Devil
  * @create 2022-03-11 21:12
  */
-@Component
 public class RedisIdWorker {
 
     /**

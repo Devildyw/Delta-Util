@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 /**
  * @author B站 黑马虎哥
  */
+@SuppressWarnings("all")
 public class RegexUtils {
     /**
      * 是否是无效手机格式
