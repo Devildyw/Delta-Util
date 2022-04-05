@@ -9,8 +9,9 @@ import java.io.IOException;
  * @author Devil
  * @create 2022-04-05 23:31
  */
+@SuppressWarnings("all")
 public class FastDfsUtil {
-    private final FastDfsClient fastDfsClient;
+    private FastDfsClient fastDfsClient;
 
     public FastDfsUtil(String prefixFilePath) {
         this.fastDfsClient = new FastDfsClient(prefixFilePath);

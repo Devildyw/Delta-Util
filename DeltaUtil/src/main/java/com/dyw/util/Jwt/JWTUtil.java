@@ -7,8 +7,9 @@ import io.jsonwebtoken.Claims;
  * @author Devil
  * @create 2022-04-05 23:42
  */
+@SuppressWarnings("all")
 public class JWTUtil {
-    private final JwtWork jwtWork;
+    private JwtWork jwtWork;
 
     public JWTUtil(String keySecretSalt) {
         this.jwtWork = new JwtWork(keySecretSalt);
@@ -20,6 +21,9 @@ public class JWTUtil {
 
     public JWTUtil(long tokenExpiredTime) {
         this.jwtWork = new JwtWork(tokenExpiredTime);
+    }
+    public JWTUtil(){
+        this.jwtWork = new JwtWork();
     }
 
     public JWTUtil(String jwtId, String keySecretSalt) {

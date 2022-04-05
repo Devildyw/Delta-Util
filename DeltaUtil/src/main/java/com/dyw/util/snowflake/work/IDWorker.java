@@ -12,8 +12,11 @@ import java.net.InetAddress;
 @SuppressWarnings("all")
 public class IDWorker {
     //十位的工作机器码
-    private long workerId = 0L; //工作id 五位
-    private long datacenterId = 0L; //数据中心id 五位
+    private long workerId; //工作id 五位
+    private long datacenterId; //数据中心id 五位
+
+    public IDWorker() {
+    }
 
     //12位序列号
     private long sequence = 0L;
@@ -42,9 +45,6 @@ public class IDWorker {
     //上次时间戳, 初始值位负值
     private long lastTimestamp = -1L;
 
-    //无参构造
-    public IDWorker(){
-    }
     /**
      * 构造方法
      * @param workerId 工作节点id

@@ -11,7 +11,7 @@
     <packaging>jar</packaging>
     <groupId>com.dyw</groupId>
     <artifactId>Delta-Util</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.4-SNAPSHOT</version>
     <name>DeltaUtil</name>
     <description>DeltaUtil</description>
     <properties>
@@ -26,6 +26,11 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
             <version>${jjwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.1</version>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>

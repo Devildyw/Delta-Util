@@ -1,10 +1,12 @@
 package com.dyw.util.Jwt.work;
 
+import com.google.common.io.BaseEncoding;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +17,7 @@ import java.util.Map;
  * @create 2022-03-14 19:02
  */
 
-@SuppressWarnings("all")
+//@SuppressWarnings("all")
 public class JwtWork {
     public long getTokenExpiredTime() {
         return tokenExpiredTime;
@@ -78,9 +80,9 @@ public class JwtWork {
      * @return SecretKey
      */
     public SecretKey generalKey() {
-        String secretSalt = keySecretSalt;
-        byte[] decode = Decoders.BASE64.decode(secretSalt);
-        return Keys.hmacShaKeyFor(decode);
+        byte[] decode = BaseEncoding.base64().decode(keySecretSalt);
+        return new SecretKeySpec(decode, 0, decode.length, "HmacSHA256");
+
     }
 
     /**
@@ -105,7 +107,7 @@ public class JwtWork {
                 //签发时间
                 .setIssuedAt(now)
                 //使用指定算法进行签名加密
-                .signWith(secretKey, signatureAlgorithm);
+                .signWith(signatureAlgorithm,secretKey);
         //生成jwt的时间
         long nowMillis = System.currentTimeMillis();
         if (time >= 0) {
@@ -118,8 +120,9 @@ public class JwtWork {
     public Claims verifyJwt(String token) {
         //签名密钥, 同一密钥明文生成的密钥相同
         SecretKey secretKey = generalKey();
-        JwtParser build = Jwts.parserBuilder().setSigningKey(secretKey).build();
-        return build.parseClaimsJws(token).getBody();
+        Claims claims;
+        claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        return claims;
     }
 
     /**
