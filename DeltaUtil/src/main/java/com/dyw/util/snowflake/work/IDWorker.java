@@ -22,7 +22,7 @@ public class IDWorker {
     private long sequence = 0L;
 
     //初始时间戳
-    private final long twEpoch = 1649163644246L;
+    private final long twEpoch = 1288834974657L;
 
     //长度为5位
     private final long workerIdBits = 5L;
